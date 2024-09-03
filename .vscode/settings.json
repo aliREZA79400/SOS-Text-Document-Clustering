@@ -1,0 +1,15 @@
+{   "workbench.colorCustomizations": {
+    "editor.background":"#1a1818",
+    "activityBar.activeBackground" :"#0d0e0e",
+    "activityBar.foreground" : "#d6d6dc",
+    "activityBar.activeBorder" :"#0523bb",},
+"terminal.integrated.suggest.enabled": true,
+
+"workbench.colorTheme": "Monokai",
+"workbench.tree.indent": 14,
+"workbench.tree.renderIndentGuides": "always",
+"editor.fontFamily": "Fira Code",
+"editor.fontLigatures":true,
+"editor.fontSize": 15,
+"editor.lineHeight": 1.7,
+}
