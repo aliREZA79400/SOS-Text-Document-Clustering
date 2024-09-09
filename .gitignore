@@ -1,4 +1,6 @@
 /env
+/bbcsport
+/bbcsport-fulltext
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
