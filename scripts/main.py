@@ -113,6 +113,8 @@ def main_runner_bbc_sport(NUM_CLUSTERS:int,NUM_DATA:int,algorithm:str,HP:Tuple[t
 
     apply_file(results,file_name=file_name_to_save)
 
+    return results
+
 if __name__ == "__main__":
     if args.dataset_name == "20 News Group":
         main_runner_20news(NUM_CLUSTERS=args.cluster,NUM_DATA=args.num_data,algorithm=args.algorithm_name,

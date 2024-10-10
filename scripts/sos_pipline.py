@@ -55,10 +55,10 @@ def sos_pipeline_news(categories=None,K:int=None,NUM_SAMPLES:int=None,
 
 
 ######
-mtx_file_path = "/media/alireza/SSD/arshad_hosh/Thesis/ThesisCode/bbcsport/bbcsport.mtx"
+mtx_file_path = "/media/alireza/SSD1/arshad_hosh/Thesis/ThesisCode/bbcsport/bbcsport.mtx"
 # targets
 trg = []
-with open("/media/alireza/SSD/arshad_hosh/Thesis/ThesisCode/bbcsport/bbcsport.classes" , "r") as f :
+with open("/media/alireza/SSD1/arshad_hosh/Thesis/ThesisCode/bbcsport/bbcsport.classes" , "r") as f :
     for line in f :
         trg.append(int(line.split()[1]))
 
