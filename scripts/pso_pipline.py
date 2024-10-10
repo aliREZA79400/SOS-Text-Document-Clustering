@@ -51,7 +51,7 @@ def pso_pipeline_20news(categories=None,K:int=None,NUM_SAMPLES:int=None,
     return g_best, start_index[0], elapsed
 
 
-######
+### Rewrite this section code
 mtx_file_path = "/media/alireza/SSD1/arshad_hosh/Thesis/ThesisCode/bbcsport/bbcsport.mtx"
 # targets
 trg = []

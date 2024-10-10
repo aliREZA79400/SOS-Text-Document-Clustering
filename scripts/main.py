@@ -5,8 +5,10 @@ from tqdm import tqdm
 import random
 
 from pso_pipline import pso_pipeline_20news , pso_pipeline_bbc_sport
-from sos_pipline import sos_pipeline_news , sos_pipeline_bbc_sport
+from sos_pipline import sos_pipeline_news , sos_pipeline_bbc_sport , nwsos_pipeline_bbc_sport
 
+
+### parser
 parser = argparse.ArgumentParser(description="Runner of Tests ")
 ### Parameters that set in shell
 parser.add_argument("--cluster",type=int, help="number of clusters (int)")
@@ -14,11 +16,8 @@ parser.add_argument("--num_data",type=int, help="number of sampls (int)")
 parser.add_argument("--file_name",type=str, help="file_name_to_save (str)")
 parser.add_argument("--algorithm_name",type=str, help="Algorith name : PSO | SOS (str)")
 parser.add_argument("--dataset_name",type=str, help="Dataset name : 20 News Group | BBC Sport (srt)")
-### 
-
 # parser.add_argument("epoch" ,type=int, help="number of itrations(int)")
 # parser.add_argument("pop_size",type=int, help="number of population(int)")
-
 args = parser.parse_args()
 
 ### Parameters that set in script
@@ -92,13 +91,17 @@ def main_runner_bbc_sport(NUM_CLUSTERS:int,NUM_DATA:int,algorithm:str,HP:Tuple[t
     results  = []
     for hy_pa in tqdm(HP):               
                 for i in range(NIA):
-                    if algorithm == "PSO":
-                        g_best, elapsed  = pso_pipeline_bbc_sport(K=NUM_CLUSTERS,NUM_SAMPLES = NUM_DATA,
+                    match algorithm :
+                        case "PSO":
+                            g_best, elapsed  = pso_pipeline_bbc_sport(K=NUM_CLUSTERS,NUM_SAMPLES = NUM_DATA,
                                                         max_feature=hy_pa[2],epoch=hy_pa[0],pop_size=hy_pa[1])
-                    elif algorithm == "SOS":
-                        g_best,elapsed  = sos_pipeline_bbc_sport(K=NUM_CLUSTERS,NUM_SAMPLES = NUM_DATA,
+                        case "SOS":
+                            g_best,elapsed  = sos_pipeline_bbc_sport(K=NUM_CLUSTERS,NUM_SAMPLES = NUM_DATA,
                                                         max_feature=hy_pa[2],epoch=hy_pa[0],pop_size=hy_pa[1])
-                    else :
+                        case "nwSOS" :
+                            g_best,elapsed  = nwsos_pipeline_bbc_sport(K=NUM_CLUSTERS,NUM_SAMPLES = NUM_DATA,
+                                                        max_feature=hy_pa[2],epoch=hy_pa[0],pop_size=hy_pa[1])
+                        case None :
                          raise ValueError("Algorithm name is wrong!!! or does not exsit")
                     
                     # Save results
