@@ -1,12 +1,15 @@
 import argparse
 import os
-from typing import  Tuple
-from tqdm import tqdm
 import random
+from typing import Tuple
 
-from pso_pipline import pso_pipeline_20news , pso_pipeline_bbc_sport
-from sos_pipline import sos_pipeline_news , sos_pipeline_bbc_sport , nwsos_pipeline_bbc_sport
-
+from pso_pipline import  (pso_pipeline_20news,
+                          pso_pipeline_bbc_sport)
+from sos_pipline import (
+                        sos_main_pipeline_bbc_sport,
+                        sos_pipeline_news,
+                        )
+from tqdm import tqdm
 
 ### parser
 parser = argparse.ArgumentParser(description="Runner of Tests ")
@@ -21,7 +24,8 @@ parser.add_argument("--dataset_name",type=str, help="Dataset name : 20 News Grou
 args = parser.parse_args()
 
 ### Parameters that set in script
-hyper_parameters= ((100,10,30),(100,20,60),(100,30,100))
+                  #epoch , pop size , maxfeature 
+hyper_parameters= ((200,10,30),(200,20,60),(200,30,100))
 
 all_categories_20news = ['alt.atheism',
  'comp.graphics',
@@ -47,7 +51,7 @@ all_categories_20news = ['alt.atheism',
 ###
 
 def apply_file(res_dict:dict,file_name :str):
-    import pickle 
+    import pickle
     os.system(f"touch {file_name}.pkl")
     print("file created")
     with open(file_name + ".pkl" , "wb") as f :
@@ -82,10 +86,10 @@ def main_runner_20news(NUM_CLUSTERS:int,NUM_DATA:int,algorithm:str,HP:Tuple[tupl
                         "run" : i
                     })
 
-                    print(f"hyper parameters {hy_pa} category {my_category}")
+                    print(f"hyper parameters {hy_pa} category {my_category} elapse {elapsed}")
 
     apply_file(results,file_name=file_name_to_save)
-
+    return results
 
 def main_runner_bbc_sport(NUM_CLUSTERS:int,NUM_DATA:int,algorithm:str,HP:Tuple[tuple],file_name_to_save:str,NIA:int = 2):
     results  = []
@@ -96,11 +100,14 @@ def main_runner_bbc_sport(NUM_CLUSTERS:int,NUM_DATA:int,algorithm:str,HP:Tuple[t
                             g_best, elapsed  = pso_pipeline_bbc_sport(K=NUM_CLUSTERS,NUM_SAMPLES = NUM_DATA,
                                                         max_feature=hy_pa[2],epoch=hy_pa[0],pop_size=hy_pa[1])
                         case "SOS":
-                            g_best,elapsed  = sos_pipeline_bbc_sport(K=NUM_CLUSTERS,NUM_SAMPLES = NUM_DATA,
-                                                        max_feature=hy_pa[2],epoch=hy_pa[0],pop_size=hy_pa[1])
+                            g_best,elapsed  = sos_main_pipeline_bbc_sport(K=NUM_CLUSTERS,NUM_SAMPLES = NUM_DATA,
+                                                        max_feature=hy_pa[2],epoch=hy_pa[0],pop_size=hy_pa[1],sos_variant="SOS")
                         case "nwSOS" :
-                            g_best,elapsed  = nwsos_pipeline_bbc_sport(K=NUM_CLUSTERS,NUM_SAMPLES = NUM_DATA,
-                                                        max_feature=hy_pa[2],epoch=hy_pa[0],pop_size=hy_pa[1])
+                            g_best,elapsed  = sos_main_pipeline_bbc_sport(K=NUM_CLUSTERS,NUM_SAMPLES = NUM_DATA,
+                                                        max_feature=hy_pa[2],epoch=hy_pa[0],pop_size=hy_pa[1],sos_variant="nwSOS")
+                        case "mySOS" :
+                            g_best,elapsed  = sos_main_pipeline_bbc_sport(K=NUM_CLUSTERS,NUM_SAMPLES = NUM_DATA,
+                                                        max_feature=hy_pa[2],epoch=hy_pa[0],pop_size=hy_pa[1],sos_variant="mySOS")
                         case None :
                          raise ValueError("Algorithm name is wrong!!! or does not exsit")
                     
@@ -120,9 +127,12 @@ def main_runner_bbc_sport(NUM_CLUSTERS:int,NUM_DATA:int,algorithm:str,HP:Tuple[t
 
 if __name__ == "__main__":
     if args.dataset_name == "20 News Group":
-        main_runner_20news(NUM_CLUSTERS=args.cluster,NUM_DATA=args.num_data,algorithm=args.algorithm_name,
+        res = main_runner_20news(NUM_CLUSTERS=args.cluster,NUM_DATA=args.num_data,algorithm=args.algorithm_name,
                     HP=hyper_parameters,file_name_to_save=args.file_name)
     elif args.dataset_name == "BBC Sport" :
-        main_runner_bbc_sport(NUM_CLUSTERS=args.cluster,NUM_DATA=args.num_data,algorithm=args.algorithm_name,
+        res = main_runner_bbc_sport(NUM_CLUSTERS=args.cluster,NUM_DATA=args.num_data,algorithm=args.algorithm_name,
                     HP=hyper_parameters,file_name_to_save=args.file_name)
-         
+    
+    print(f"elapsed is {res[0]['elapsed']} mean runtime {res[0]['elapsed'] / res[0]['hy_pa'][0]}")
+    print(f"elapsed is {res[1]['elapsed']} mean runtime {res[1]['elapsed'] / res[1]['hy_pa'][0]}")
+    

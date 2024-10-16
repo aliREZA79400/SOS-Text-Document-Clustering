@@ -52,10 +52,8 @@ class Data_Clustering_Purity_Obj_Func(Problem):
 
     def obj_func(self, solution : ndarray) -> float:
         # solution == organism == individual population
-  
-        
         distance_from_centers = np.array([[np.linalg.norm(row  - cluster_center) 
-                                  for cluster_center in np.array(np.reshape(solution,(self.K,self.dataset.shape[1]))) ]
+                                  for cluster_center in np.array(np.reshape(solution,(self.K,self.dataset.shape[1])))]
                                   for row in self.dataset]) #c1r1 , c2r1 , cnr1 
                                                             #..............ckrn  k = number of clusters  , n = number of data samples
         

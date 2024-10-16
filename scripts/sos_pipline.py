@@ -18,7 +18,7 @@ from models import Data_Clustering_Purity_Obj_Func
 # from models import Data_Clustering_Purity_Obj_Func
 
 from nwSOS import nwSOS
-
+from mySOS import mySOS
 
 BASE_DIR = os.getcwd()
 
@@ -55,7 +55,7 @@ def sos_pipeline_news(categories=None,K:int=None,NUM_SAMPLES:int=None,
 
     return g_best  , start_index[0] , elapsed
 
-
+### need add sos variants tp news pipline
 ### Rewrite this code
 mtx_file_path = "/media/alireza/SSD1/arshad_hosh/Thesis/ThesisCode/bbcsport/bbcsport.mtx"
 # targets
@@ -64,8 +64,8 @@ with open("/media/alireza/SSD1/arshad_hosh/Thesis/ThesisCode/bbcsport/bbcsport.c
     for line in f :
         trg.append(int(line.split()[1]))
 
-def sos_pipeline_bbc_sport(K:int=None,NUM_SAMPLES:int=None,       
-                   max_feature:int=None,epoch:int=None,pop_size:int=None):
+def sos_main_pipeline_bbc_sport(K:int=None,NUM_SAMPLES:int=None,       
+                   max_feature:int=None,epoch:int=None,pop_size:int=None,sos_variant:str=None):
     
 
     # Read the mtx file into a scipy sparse matrix
@@ -101,7 +101,13 @@ def sos_pipeline_bbc_sport(K:int=None,NUM_SAMPLES:int=None,
 
 
     ### build model (instance)
-    model = SOS.OriginalSOS(epoch=epoch,pop_size=pop_size)
+    match sos_variant :
+        case "SOS":
+            model = SOS.OriginalSOS(epoch=epoch,pop_size=pop_size)
+        case "nwSOS" :
+            model = nwSOS(epoch=epoch,pop_size=pop_size)
+        case "mySOS" :
+            model = mySOS(epoch=epoch,pop_size=pop_size)
 
     ### train model  with solve ( training modes )
     start_time = time.time()
@@ -111,50 +117,3 @@ def sos_pipeline_bbc_sport(K:int=None,NUM_SAMPLES:int=None,
 
     return g_best, elapsed
 
-
-def nwsos_pipeline_bbc_sport(K:int=None,NUM_SAMPLES:int=None,       
-                   max_feature:int=None,epoch:int=None,pop_size:int=None):
-    
-
-    # Read the mtx file into a scipy sparse matrix
-    numpy_mtx = mmread(mtx_file_path).toarray().transpose()
-
-    data_with_target =   list(zip(numpy_mtx , trg))
-    if K == 5 :
-        data_with_target = random.sample(data_with_target,NUM_SAMPLES)
-    else :
-        # class_labals = random.sample(range(5),K)
-        class_labals = [0,1]
-        data_with_target = [i for i in data_with_target if i[1] in class_labals]
-        data_with_target = random.sample(data_with_target,NUM_SAMPLES)
-
-    sampled_data , sampled_target = zip(*data_with_target)
-    sampled_data = np.array(list(sampled_data))
-
-    # Create a TfidfTransformer object
-    tfidf_transformer = TfidfTransformer()
-
-    # Fit the transformer to the count matrix and transform it to a TF-IDF matrix
-    tfidf = tfidf_transformer.fit_transform(sampled_data)
-    svd = TruncatedSVD(n_components=max_feature)
-    X_new = svd.fit_transform(tfidf.toarray())
-
-    bound = generate(K=K,dataset=X_new)
-
-    ### define problem with class {log training process}
-    problem_ins = Data_Clustering_Purity_Obj_Func(bounds=bound,
-                                                  K=K,
-                                                  target=list(sampled_target),
-                                                  dataset=X_new)
-
-
-    ### build model (instance)
-    model = nwSOS(epoch=epoch,pop_size=pop_size)
-
-    ### train model  with solve ( training modes )
-    start_time = time.time()
-    g_best  = model.solve(problem=problem_ins)
-    end_time = time.time()
-    elapsed  = end_time - start_time
-
-    return g_best, elapsed
